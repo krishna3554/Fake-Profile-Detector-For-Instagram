@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstaGuard - Fake Instagram Account Detector</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body data-theme="light">
+    <canvas id="particleCanvas"></canvas>
+    <canvas id="orbCanvas"></canvas>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fab fa-instagram"></i>
+                <span>InstaGuard</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#how-it-works">How It Works</a>
+                <a href="#api">API</a>
+                <a href="#contact">Contact</a>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <div class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#home">Home</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#api">API</a>
+        <a href="#contact">Contact</a>
+        <button class="theme-toggle mobile-theme-toggle" id="mobileThemeToggle">
+            <i class="fas fa-moon"></i> Toggle Theme
+        </button>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <h1 class="hero-title">Detect Fake Instagram Accounts with AI</h1>
+            <p class="hero-subtitle">Analyze profiles, content, and behavior patterns to identify suspicious accounts</p>
+            
+            <!-- Input Mode Toggle -->
+            <div class="input-mode-toggle">
+                <button class="mode-btn active" data-mode="auto">Auto Analysis</button>
+                <button class="mode-btn" data-mode="manual">Manual Input</button>
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box" id="autoInput">
+                    <i class="fab fa-instagram"></i>
+                    <input type="text" id="usernameInput" placeholder="@username or Instagram profile URL">
+                    <button id="analyzeBtn" class="analyze-btn">
+                        <i class="fas fa-search"></i> Analyze
+                    </button>
+                </div>
+
+                <!-- Manual Input Form -->
+                <div class="manual-input" id="manualInput" style="display: none;">
+                    <div class="manual-form">
+                        <div class="form-group">
+                            <label for="manualUsername">Username</label>
+                            <input type="text" id="manualUsername" placeholder="@username">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="manualFollowers">Followers</label>
+                                <input type="number" id="manualFollowers" placeholder="1000">
+                            </div>
+                            <div class="form-group">
+                                <label for="manualFollowing">Following</label>
+                                <input type="number" id="manualFollowing" placeholder="500">
+                            </div>
+                            <div class="form-group">
+                                <label for="manualPosts">Posts</label>
+                                <input type="number" id="manualPosts" placeholder="50">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="manualBio">Bio</label>
+                            <textarea id="manualBio" placeholder="Enter profile bio..." rows="3"></textarea>
+                        </div>
+                        <button id="analyzeManualBtn" class="analyze-btn manual-analyze-btn">
+                            <i class="fas fa-chart-bar"></i> Analyze Manual Data
+                        </button>
+                    </div>
+                </div>
+
+                <p class="search-example">Examples: @username, https://instagram.com/username</p>
+            </div>
+
+            <!-- Error Card -->
+            <div class="error-card" id="errorCard" style="display: none;">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="error-content">
+                    <h4>Invalid Input</h4>
+                    <p id="errorMessage">Please check your input and try again.</p>
+                </div>
+                <button class="error-close" id="errorClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="results" style="display: none;">
+        <div class="container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-image">
+                    <img id="profileImg" src="" alt="Profile Picture">
+                    <div class="verification-badge" id="verificationBadge">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <h2 id="profileName">Username</h2>
+                    <div class="confidence-badge" id="confidenceBadge">
+                        <span class="badge-text">Low Risk</span>
+                    </div>
+                    <div class="risk-score" id="riskScore">
+                        <span class="score-text">Confidence Score: </span>
+                        <span class="score-value">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="followersCount">0</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="followingCount">0</div>
+                    <div class="stat-label">Following</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="postsCount">0</div>
+                    <div class="stat-label">Posts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="engagementRate">0%</div>
+                    <div class="stat-label">Engagement</div>
+                </div>
+            </div>
+
+            <!-- Analysis Tabs -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="overview">
+                        <i class="fas fa-chart-pie"></i> Overview
+                    </button>
+                    <button class="tab-btn" data-tab="profile">
+                        <i class="fas fa-user"></i> Profile Analysis
+                    </button>
+                    <button class="tab-btn" data-tab="engagement">
+                        <i class="fas fa-heart"></i> Engagement
+                    </button>
+                    <button class="tab-btn" data-tab="content">
+                        <i class="fas fa-image"></i> Content
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane active" id="overview">
+                        <div class="risk-breakdown">
+                            <h3>Risk Breakdown</h3>
+                            <div class="metric-bars">
+                                <div class="metric">
+                                    <label>Profile Authenticity</label>
+                                    <div class="progress-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="profileAuthBar"></div>
+                                        </div>
+                                        <span class="metric-value" id="profileAuthValue">0%</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <label>Follower Quality</label>
+                                    <div class="progress-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="followerQualityBar"></div>
+                                        </div>
+                                        <span class="metric-value" id="followerQualityValue">0%</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <label>Content Consistency</label>
+                                    <div class="progress-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="contentConsistencyBar"></div>
+                                        </div>
+                                        <span class="metric-value" id="contentConsistencyValue">0%</span>
+                                    </div>
+                                </div>
+                                <div class="metric">
+                                    <label>Activity Patterns</label>
+                                    <div class="progress-container">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="activityPatternsBar"></div>
+                                        </div>
+                                        <span class="metric-value" id="activityPatternsValue">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="red-flags">
+                            <h3><i class="fas fa-flag"></i> Detected Red Flags</h3>
+                            <ul id="redFlagsList">
+                                <!-- Red flags will be populated here -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Profile Analysis Tab -->
+                    <div class="tab-pane" id="profile">
+                        <div class="analysis-grid">
+                            <div class="analysis-card glass-card">
+                                <h4><i class="fas fa-info-circle"></i> Account Information</h4>
+                                <div class="info-list">
+                                    <div class="info-item">
+                                        <span>Account Age</span>
+                                        <span id="accountAge">Unknown</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span>Username Pattern</span>
+                                        <span id="usernamePattern">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span>Bio Completeness</span>
+                                        <span id="bioCompleteness">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span>Profile Picture</span>
+                                        <span id="profilePicture">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="analysis-card glass-card">
+                                <h4><i class="fas fa-users"></i> Follower Analysis</h4>
+                                <div class="info-list">
+                                    <div class="info-item">
+                                        <span>Follower/Following Ratio</span>
+                                        <span id="followerRatio">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span>Follower Growth</span>
+                                        <span id="followerGrowth">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span>Estimated Fake Followers</span>
+                                        <span id="fakeFollowers">-</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span>Engagement Rate</span>
+                                        <span id="detailedEngagement">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Engagement Tab -->
+                    <div class="tab-pane" id="engagement">
+                        <div class="analysis-card glass-card">
+                            <h4><i class="fas fa-chart-line"></i> Engagement Metrics</h4>
+                            <p>Detailed engagement analysis coming soon...</p>
+                        </div>
+                    </div>
+
+                    <!-- Content Tab -->
+                    <div class="tab-pane" id="content">
+                        <div class="analysis-card glass-card">
+                            <h4><i class="fas fa-images"></i> Content Analysis</h4>
+                            <p>Content pattern analysis coming soon...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn-secondary" id="exportBtn">
+                    <i class="fas fa-file-pdf"></i> Export PDF Report
+                </button>
+                <button class="btn-primary" id="newAnalysisBtn">
+                    <i class="fas fa-plus"></i> New Analysis
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>Analyzing Instagram Account</h3>
+            <p>This may take a few seconds...</p>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="loadingProgressBar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
